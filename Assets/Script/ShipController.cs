@@ -4,87 +4,193 @@ using UnityEngine;
 
 public class ShipController : MonoBehaviour
 {
+
+	
+
 	Rigidbody rb;
 	public float Acceleration;
 	public float Deceleration;
 	private float speed;
 	public float angularespeed;
 	public float MaxVelocity;
+	public float MaxSpeed;
+	public float Straffspeed;
 
-    // Start is called before the first frame update
-    void Start()
-    {
+	float DistanceFromObjectif;
+
+
+
+	static public Camera currentCamera;
+	public Camera ThirdPersonCam;
+	public Camera FirstPersonCam;
+
+	Ray rayDirection;
+	Ray ShipOrientationRay;
+
+	Vector3 WorldPosPointed;
+	float mouseXAxis;
+	float mouseYAxis;
+
+	public Vector2 AxisSensitivity;
+
+	public Canon LeftCanon;
+	public Canon RightCanon;
+
+	public SpaceShipUI shpashipUI;
+
+	//Poissible class for shoot only
+
+
+	// Start is called before the first frame update
+	void Start()
+	{
 		rb = GetComponent<Rigidbody>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-		if(Input.GetKey(KeyCode.Z))
-		{
-			IncreaseSpeed();
-		}
-
-		if (Input.GetKey(KeyCode.S))
-		{
-			DecreaseSpeed();
-		}
-
-		MoveForwarde();
-		if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
-		{
-			TurnYaxis(1, angularespeed);
-		}
-		if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Q))
-		{
-			TurnYaxis(-1, angularespeed);
-		}
-
-		if (Input.GetKey(KeyCode.C) )
-		{
-			MoveUp(1, speed);
-		}
-		if (Input.GetKey(KeyCode.X) )
-		{
-			MoveUp(-1, speed);
-		}
-
-		rb.velocity = Vector3.ClampMagnitude(rb.velocity,MaxVelocity);
+		currentCamera = ThirdPersonCam;
+		//Cursor.lockState = CursorLockMode.Locked;
 	}
 
+	// Update is called once per frame
+	void Update()
+	{
+		float forwardInputValue = Input.GetAxis("Vertical");
+		float horizontalInputValue = Input.GetAxis("Horizontal");
+		float rotattiveInputValue = Input.GetAxis("CentralRotation");
+
+			mouseXAxis += Input.GetAxis("Mouse X") * (Time.deltaTime * AxisSensitivity.x);
+			mouseXAxis = Mathf.Clamp(mouseXAxis, -1, +1);
+
+			mouseYAxis += Input.GetAxis("Mouse Y") * (Time.deltaTime * AxisSensitivity.y);
+			mouseYAxis = Mathf.Clamp(mouseYAxis, -1, +1);
+		
+
+		if (forwardInputValue != 0 || horizontalInputValue != 0)
+		{
+			Straff(horizontalInputValue);
+			IncreaseSpeed(forwardInputValue);
+			rb.drag = 0;
+		}
+		else
+		{
+			DecreaseSpeed();
+			rb.drag = MaxVelocity * 0.25f;
+		}
+
+
+		TurnOnAxis(transform.right,-mouseYAxis, angularespeed);
+		TurnOnAxis(transform.up,mouseXAxis, angularespeed);
+		TurnOnAxis(transform.forward,-rotattiveInputValue, angularespeed);
+
+		if (Input.GetKeyUp(KeyCode.LeftControl))
+		{
+			ChangeCamera();
+		}
+
+		if(Input.GetMouseButtonDown(0))
+		{
+			Shoot();
+		}
+
+		//GetDirectionPoint();
+		RotateCanon();
+		MoveForwarde();
+		rb.velocity = Vector3.ClampMagnitude(rb.velocity, MaxVelocity);
+	}
+
+
+
+
+	void MoveForwarde()
+	{
+		rb.velocity += transform.forward * (Time.deltaTime * speed);
+
+	}
+
+	void TurnOnAxis(Vector3 RotaionAxis,float Direction, float Magnitude)
+	{
+		rb.angularVelocity += (RotaionAxis * (Time.deltaTime * Magnitude) * Direction);
+	}
+	
+
+
+	void Straff(float direction)
+	{
+		rb.velocity += (transform.right * (Time.deltaTime* Straffspeed)) * direction;
+	}
+
+	void MoveUp(float Direction, float Speed)
+	{
+		rb.velocity += (transform.up * (Time.deltaTime * Speed) * Direction);
+	}
+
+	public void DecreaseSpeed()
+	{
+		if(speed > 0)
+		{
+			speed -= Time.deltaTime * Deceleration;
+		}
+
+	else if (speed < 0)
+		{
+			speed += Time.deltaTime * Deceleration;
+		}
+	}
+	public void IncreaseSpeed(float Direction)
+	{
+			speed += (Time.deltaTime * Acceleration) * Direction;
+			speed = Mathf.Clamp(speed, -MaxSpeed, MaxSpeed);
+	}
 	public Vector3 GetVelocity()
 	{
 		return rb.velocity;
 	}
 
-	void MoveForwarde()
+	public Vector3 GetWorldPosPointed()
 	{
-		rb.velocity += transform.forward * (Time.deltaTime * speed);
+		return WorldPosPointed;
 	}
 
-	void TurnYaxis(float Direction, float Magnitude)
+	public float GetSpeed()
 	{
-		rb.angularVelocity += (transform.up * (Time.deltaTime * Magnitude) * Direction);
+		return speed;
 	}
 
-	void MoveUp(float Direction,float Speed)
-	{
-		rb.velocity += (transform.up * (Time.deltaTime * Speed) * Direction);
-	}
 
-	public void IncreaseSpeed()
+	
+	public void ChangeCamera()
 	{
-		if(speed < MaxVelocity)
+		if (FirstPersonCam.gameObject.activeInHierarchy)
 		{
-			speed += (Time.deltaTime * Acceleration);
-			speed = Mathf.Clamp(speed, 0, 10);
+			FirstPersonCam.gameObject.SetActive(false);
+			ThirdPersonCam.gameObject.SetActive(true);
+			currentCamera = ThirdPersonCam;
+		}
+
+		else
+		{
+			FirstPersonCam.gameObject.SetActive(true);
+			ThirdPersonCam.gameObject.SetActive(false);
+			currentCamera = FirstPersonCam;
 		}
 	}
 
-	public void DecreaseSpeed()
+	public Vector3 GetRotationAxis()
 	{
-			speed -= (Time.deltaTime * Deceleration);
-			speed =  Mathf.Clamp(speed, -10, 0);
+		return new Vector3(mouseXAxis, mouseYAxis, 0);
 	}
+
+
+	public void RotateCanon()
+	{
+		Vector3 RayDirection = shpashipUI.GetCursorRay().direction;
+
+		LeftCanon.CanonLookInDirectionOf(RayDirection);
+		RightCanon.CanonLookInDirectionOf(RayDirection);
+	}
+	public void Shoot()
+	{
+		LeftCanon.Shoot(speed);
+		RightCanon.Shoot(speed);
+	}
+
+
 }
