@@ -17,7 +17,7 @@ public class DebugScreen : MonoBehaviour
     void Update()
     {
 		SpeedShip.text = "Speed : " + Currentship.GetSpeed();
-		VelocityShip.text = "Velocity : " + Currentship.GetVelocity();
+		VelocityShip.text = "Velocity : " + Currentship.GetVelocity().magnitude;
 		ScreenWorldPos.text = "ScreenPos : " + Currentship.GetWorldPosPointed();
 
 		if(Input.GetKeyDown(KeyCode.P))

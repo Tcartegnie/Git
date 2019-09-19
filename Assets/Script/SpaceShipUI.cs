@@ -25,7 +25,7 @@ public class SpaceShipUI : MonoBehaviour
 
 		MoveCursor(mouseAxis.x, mouseAxis.y);
 
-		Debug.DrawRay(shipController.transform.position, GetCursorRay().direction * 1000, Color.red);
+		//Debug.DrawRay(shipController.transform.position, GetCursorRay().direction * 1000, Color.red);
 	} 
 
 	public void MoveCursor(float X, float Y)
@@ -37,7 +37,7 @@ public class SpaceShipUI : MonoBehaviour
 
 	}
 
-	public Ray GetCursorRay()
+	public Ray GetCursorRay()//This must go in the part of the script
 	{
 		return ShipController.currentCamera.ScreenPointToRay(ShipCursor.position);
 	}

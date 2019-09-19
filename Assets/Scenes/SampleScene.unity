@@ -1286,15 +1286,22 @@ MonoBehaviour:
   Acceleration: 10
   Deceleration: 10
   angularespeed: 10
-  MaxVelocity: 20
+  MaxVelocity: 40
   MaxSpeed: 75
   Straffspeed: 25
+  liftingoffPower: 5000
   ThirdPersonCam: {fileID: 947569727}
   FirstPersonCam: {fileID: 963194227}
+  BoosterLVL: 0
+  BoosterPower: 150
+  BoostAcceleration: 2
+  BoostDeceleration: 5
+  FloorMinDistance: 100
   AxisSensitivity: {x: 0.65, y: 0.65}
   LeftCanon: {fileID: 1609471931}
   RightCanon: {fileID: 921039463}
   shpashipUI: {fileID: 1157122258}
+  ShipLanded: 0
 --- !u!54 &1160057081
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1304,7 +1311,7 @@ Rigidbody:
   m_GameObject: {fileID: 1160057078}
   serializedVersion: 2
   m_Mass: 5
-  m_Drag: 1
+  m_Drag: 0.75
   m_AngularDrag: 5
   m_UseGravity: 0
   m_IsKinematic: 0
@@ -1361,7 +1368,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

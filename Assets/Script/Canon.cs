@@ -10,12 +10,12 @@ public class Canon : MonoBehaviour
 	public Transform CanonForward;
 	public float Yoffset;
 
-	public void CanonLookInDirectionOf(Vector3 directon)
+	public void TargetPoint(Vector3 Point)
 	{
 
-		Debug.DrawRay(transform.position, directon * 1000 , Color.green);
+		//Debug.DrawRay(transform.position, Point * 1000 , Color.green);
 		//Add an offset 
-		transform.rotation = Quaternion.LookRotation(directon);
+		transform.rotation = Quaternion.LookRotation(Point);
 	}
 
 	public void Shoot(float ShipSpeed)
