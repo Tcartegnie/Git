@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ShipController : MonoBehaviour
@@ -16,6 +15,14 @@ public class ShipController : MonoBehaviour
 	public float MaxSpeed;
 	public float Straffspeed;
 	public float liftingoffPower;
+
+	public float Life;
+	public float LifeMax;
+
+	float ShieldRegenTime;
+
+	public float Shield;
+	public float ShieldMax;
 
 	float DistanceFromObjectif;
 
@@ -40,8 +47,7 @@ public class ShipController : MonoBehaviour
 
 	public Vector2 AxisSensitivity;
 
-	public Canon LeftCanon;
-	public Canon RightCanon;
+	
 
 	public SpaceShipUI shpashipUI;
 
@@ -56,6 +62,9 @@ public class ShipController : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 		currentCamera = ThirdPersonCam;
 		//Cursor.lockState = CursorLockMode.Locked;
+		Shield = ShieldMax;
+		Life = LifeMax;
+	//Coroutine RegenCorroutine =	StartCoroutine(RegenShield(ShieldMax));
 	}
 
 	// Update is called once per frame
@@ -71,12 +80,15 @@ public class ShipController : MonoBehaviour
 		mouseYAxis += Input.GetAxis("Mouse Y") * (Time.deltaTime * AxisSensitivity.y);
 		mouseYAxis = Mathf.Clamp(mouseYAxis, -1, +1);
 
-		
 
-		if (Input.GetMouseButtonDown(0))
+		if(Input.GetKey(KeyCode.LeftAlt))
 		{
-			Shoot();
+			OnHit(1f);
 		}
+
+
+
+
 
 		if (Input.GetMouseButtonUp(1))
 		{
@@ -129,10 +141,24 @@ public class ShipController : MonoBehaviour
 				UnBooste();
 			}
 			//GetDirectionPoint();
-			RotateCanon();
+			
 			MoveForwarde();
 		}
 		rb.velocity = Vector3.ClampMagnitude(rb.velocity, (MaxVelocity + GetBoosterValue()));
+	}
+
+
+	public void OnHit(float value)
+	{
+		if(Shield > 0)
+		{
+			Shield-=value;
+			StartCoroutine(RegenShield(ShieldMax));
+		}
+		else
+		{
+			Life-=value;
+		}
 	}
 
 
@@ -226,21 +252,26 @@ public class ShipController : MonoBehaviour
 	//	Gizmos.DrawSphere(TargetPos, 2);
 	//}
 
-	public void RotateCanon()
+
+	public float GetNormalizedSpeed()
 	{
-		Vector3 RayDirection = shpashipUI.GetCursorRay().direction;
-//		Vector3 TargetPos = transform.position + (RayDirection * CrossPointDistance);
-
-	
-
-		LeftCanon.TargetPoint(RayDirection);
-		RightCanon.TargetPoint(RayDirection);
+		return	((speed) / MaxSpeed);
 	}
 
-	public void Shoot()
+	public float GetNormalizedLife()
 	{
-		LeftCanon.Shoot(speed);
-		RightCanon.Shoot(speed);
+		return (Life / LifeMax);
+	}
+
+
+	public float GetNormalizedShield()
+	{
+		return (Shield / ShieldMax);
+	}
+
+	public float GetNormalizedVelocity()
+	{
+		return ((rb.velocity.magnitude) / (MaxVelocity + BoosterPower));
 	}
 
 	public void Booster()
@@ -316,5 +347,22 @@ public class ShipController : MonoBehaviour
 
 	}
 
+
+	public IEnumerator CoolDownRegenShield()
+	{
+		yield return null;
+	}
+
+	public IEnumerator RegenShield(float Value)
+	{
+		while(Shield < ShieldMax)
+		{
+			Shield += Time.deltaTime;
+			yield return null;
+		}
+
+		Shield = ShieldMax;
+	//	StartCoroutine(RegenShield(Value));
+	}
 
 }
