@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 4120666076969282}
   - component: {fileID: 33034680163459256}
   - component: {fileID: 23483353014344650}
-  m_Layer: 0
+  - component: {fileID: 582581108}
+  m_Layer: 8
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -79,6 +80,20 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!64 &582581108
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1099048681204852}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Convex: 1
+  m_CookingOptions: 14
+  m_Mesh: {fileID: 4300002, guid: 85ed974e9d1064b089cff63f0b574ec2, type: 3}
 --- !u!1 &1334483832576494
 GameObject:
   m_ObjectHideFlags: 0
@@ -91,7 +106,7 @@ GameObject:
   - component: {fileID: 33928256550773364}
   - component: {fileID: 23391772698723578}
   - component: {fileID: 125932475089092997}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RightGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -172,9 +187,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fd783c1371697f44b7affe1d7bea054, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Bullet: {fileID: 0}
+  Bullet: {fileID: 1177410387428850719, guid: 26cf1d186dc083c42bd70c871723c427, type: 3}
   ShootCooldown: 1
-  CanonForward: {fileID: 8142061342677515321}
+  CanonForward: {fileID: 3858070752333974627}
+  Yoffset: 1
 --- !u!1 &1578151531806032
 GameObject:
   m_ObjectHideFlags: 0
@@ -184,7 +200,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4185073248538102}
-  m_Layer: 0
+  - component: {fileID: 1159136207}
+  - component: {fileID: 1159136208}
+  m_Layer: 8
   m_Name: PrototypeZero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -208,6 +226,41 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1159136207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1578151531806032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 105fa492b9c181d4d865ba44601223fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Ship: {fileID: 1578151531806032}
+  Life: 150
+  LifeMax: 150
+  Shield: 150
+  ShieldMax: 150
+  IsGameover: 0
+  ShieldRegenerationRate: 5
+  ShieldCoolDownMax: 3
+--- !u!114 &1159136208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1578151531806032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06196df51d92e7549812843a6ceb3ab3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LeftCanon: {fileID: 1699903028633796227}
+  RightCanon: {fileID: 125932475089092997}
+  spaceShip: {fileID: 0}
 --- !u!1 &1794273669107246
 GameObject:
   m_ObjectHideFlags: 0
@@ -220,7 +273,7 @@ GameObject:
   - component: {fileID: 33389498194167228}
   - component: {fileID: 23963040680387486}
   - component: {fileID: 1699903028633796227}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: LeftGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -301,9 +354,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fd783c1371697f44b7affe1d7bea054, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Bullet: {fileID: 0}
+  Bullet: {fileID: 1177410387428850719, guid: 26cf1d186dc083c42bd70c871723c427, type: 3}
   ShootCooldown: 1
   CanonForward: {fileID: 8142061342677515321}
+  Yoffset: -1
 --- !u!1 &7212515651460726464
 GameObject:
   m_ObjectHideFlags: 0
