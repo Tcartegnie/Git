@@ -11,16 +11,21 @@ public class DebugScreen : MonoBehaviour
 	public Text SpeedShip;
 	public Text VelocityShip;
 	public Text ScreenWorldPos;
+	public Text ShieldEnable;
 
+	string [] EnableDisable = { "Eneable", "Diseable" };
 
     // Update is called once per frame
     void Update()
     {
-		SpeedShip.text = "Speed : " + Currentship.GetSpeed();
-		VelocityShip.text = "Velocity : " + Currentship.GetVelocity().magnitude;
-		ScreenWorldPos.text = "ScreenPos : " + Currentship.GetWorldPosPointed();
+		if (Currentship != null)
+		{
+			SpeedShip.text = "Speed : " + Currentship.GetSpeed();
 
-		if(Input.GetKeyDown(KeyCode.P))
+			VelocityShip.text = "Velocity : " + Currentship.GetVelocity().magnitude;
+		}
+
+		if (Input.GetKeyDown(KeyCode.P))
 		{
 			TurnOnOffDebugScreen(!DebugCanvas.enabled);
 		}
