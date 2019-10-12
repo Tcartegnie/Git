@@ -1,56 +1,41 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class ShipController : MonoBehaviour
+public class ShipController : Ship
 {
-
-	
-
 	Rigidbody rb;
-	public float Acceleration;
-	public float Deceleration;
-	private float speed;
-	public float angularespeed;
-	public float MaxVelocity;
-	public float MaxSpeed;
-	public float Straffspeed;
-	public float liftingoffPower;
-
-	public float Life;
-	public float LifeMax;
-
-	float ShieldRegenTime;
-
-	public float Shield;
-	public float ShieldMax;
-
-	float DistanceFromObjectif;
-
-	static public Camera currentCamera;
+	[Space]
+	static public Camera CurrentCamera;
 	public Camera ThirdPersonCam;
 	public Camera FirstPersonCam;
+	[Space]
+	[Header("Acceleration")]
+	public float Acceleration;
+	public float Deceleration;
+	[Space]
+	[Header("Speed")]
+	private float speed;
+	public float MaxVelocity;
+	public float MaxSpeed;
 
-	Ray rayDirection;
-	Ray ShipOrientationRay;
-
-	Vector3 WorldPosPointed;
+	public float Straffspeed;
+	public float liftingoffPower;
+	public float angularespeed;
+	[Space]
+	[Header("Axis move")]
 	float mouseXAxis;
 	float mouseYAxis;
-
+	[Space]
+	[Header("Booster")]
 	public float BoosterLVL;
 	public float BoosterPower;
 	[Space]
 	public float BoostAcceleration;
 	public float BoostDeceleration;
-
+	[Space]
+	[Header("Landing")]
 	public float FloorMinDistance;
-
 	public Vector2 AxisSensitivity;
-
-	
-
-	public SpaceShipUI shpashipUI;
-
 	public bool ShipLanded;
 
 	//Poissible class for shoot only
@@ -60,245 +45,206 @@ public class ShipController : MonoBehaviour
 	void Start()
 	{
 		rb = GetComponent<Rigidbody>();
-		currentCamera = ThirdPersonCam;
+		CurrentCamera = ThirdPersonCam;
+	
 		//Cursor.lockState = CursorLockMode.Locked;
-		Shield = ShieldMax;
-		Life = LifeMax;
+
 	//Coroutine RegenCorroutine =	StartCoroutine(RegenShield(ShieldMax));
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		float forwardInputValue = Input.GetAxis("Vertical");
-		float horizontalInputValue = Input.GetAxis("Horizontal");
-		float rotattiveInputValue = Input.GetAxis("CentralRotation");
-
-		mouseXAxis += Input.GetAxis("Mouse X") * (Time.deltaTime * AxisSensitivity.x);
-		mouseXAxis = Mathf.Clamp(mouseXAxis, -1, +1);
-
-		mouseYAxis += Input.GetAxis("Mouse Y") * (Time.deltaTime * AxisSensitivity.y);
-		mouseYAxis = Mathf.Clamp(mouseYAxis, -1, +1);
-
-
-		if(Input.GetKey(KeyCode.LeftAlt))
+		if (!ShipState.IsGameover)
 		{
-			OnHit(1f);
-		}
+			CallLateralAndForardMove();
+			CallMouseAxisInput();
 
 
-
-
-
-		if (Input.GetMouseButtonUp(1))
-		{
-			if (ShipLanded)
+			if (Input.GetKey(KeyCode.LeftAlt))
 			{
-				LiftOff();
-			}
-			else
-			{
-				CallLanding();
-			}
-		}
-
-
-		if (!ShipLanded)
-		{
-
-
-
-			if (forwardInputValue != 0 || horizontalInputValue != 0)
-			{
-				Straff(horizontalInputValue);
-				IncreaseSpeed(forwardInputValue);
-				rb.drag = 0;
-			}
-			else
-			{
-				DecreaseSpeed();
-				rb.drag = 2;
+				ShipState.OnHit(1f);
 			}
 
-
-			TurnOnAxis(transform.right, -mouseYAxis, angularespeed);
-			TurnOnAxis(transform.up, mouseXAxis, angularespeed);
-			TurnOnAxis(transform.forward, -rotattiveInputValue, angularespeed);
-
-			if (Input.GetKeyUp(KeyCode.LeftControl))
+			if (Input.GetMouseButtonUp(1))
 			{
-				ChangeCamera();
+				if (ShipLanded)
+				{
+					LiftOff();
+				}
+				else
+				{
+					CallLanding();
+				}
 			}
 
-
-
-			if (Input.GetKey(KeyCode.LeftShift))
+			if (!ShipLanded)
 			{
-				Booster();
+
+				CallAxisRotation();
+				if (Input.GetKeyUp(KeyCode.LeftControl))
+				{
+					ChangeCamera();
+				}
+
+				if (Input.GetKey(KeyCode.LeftShift))
+				{
+					Booster();
+				}
+				else
+				{
+					UnBooste();
+				}
+				//GetDirectionPoint();
+
+				MoveForwarde();
 			}
-			else
-			{
-				UnBooste();
-			}
-			//GetDirectionPoint();
-			
-			MoveForwarde();
+
+			ShipState.ShieldCoolDownCompute();
 		}
 		rb.velocity = Vector3.ClampMagnitude(rb.velocity, (MaxVelocity + GetBoosterValue()));
 	}
 
 
-	public void OnHit(float value)
+	public void CallMouseAxisInput()
 	{
-		if(Shield > 0)
+	
+		mouseXAxis += Input.GetAxis("Mouse X") * (Time.deltaTime * AxisSensitivity.x);
+		mouseXAxis = Mathf.Clamp(mouseXAxis, -1, +1);
+
+		mouseYAxis += Input.GetAxis("Mouse Y") * (Time.deltaTime * AxisSensitivity.y);
+		mouseYAxis = Mathf.Clamp(mouseYAxis, -1, +1);
+	}
+
+	public void CallLateralAndForardMove()
+	{
+		float forwardInputValue = Input.GetAxis("Vertical");
+		float horizontalInputValue = Input.GetAxis("Horizontal");
+
+
+		if (forwardInputValue != 0 || horizontalInputValue != 0)
 		{
-			Shield-=value;
-			StartCoroutine(RegenShield(ShieldMax));
+			Straff(horizontalInputValue);
+			IncreaseSpeed(forwardInputValue);
+			rb.drag = 0;
 		}
 		else
 		{
-			Life-=value;
+			DecreaseSpeed();
+			rb.drag = 2;
 		}
 	}
 
-
+	public void CallAxisRotation()
+	{
+		float rotattiveInputValue = Input.GetAxis("CentralRotation");
+		TurnOnAxis(transform.right, -mouseYAxis, angularespeed);
+		TurnOnAxis(transform.up, mouseXAxis, angularespeed);
+		TurnOnAxis(transform.forward, -rotattiveInputValue, angularespeed);
+	}
 
 
 	void MoveForwarde()
 	{
 		rb.velocity += transform.forward * (Time.deltaTime * (speed + GetBoosterValue()));
-	}
-
-	void TurnOnAxis(Vector3 RotaionAxis,float Direction, float Magnitude)
+	}//Movement
+	void TurnOnAxis(Vector3 RotaionAxis, float Direction, float Magnitude)
 	{
 		rb.angularVelocity += (RotaionAxis * (Time.deltaTime * Magnitude) * Direction);
-	}
-	
+	}//Movement
 	public float GetBoosterValue()
 	{
 		return BoosterPower * BoosterLVL;
 	}
-
 	void Straff(float direction)
 	{
-		rb.velocity += (transform.right * (Time.deltaTime* Straffspeed)) * direction;
-	}
-
+		rb.velocity += (transform.right * (Time.deltaTime * Straffspeed)) * direction;
+	}//Movement
 	void MoveUp(float Direction, float Speed)
 	{
 		rb.velocity += (transform.up * (Time.deltaTime * Speed) * Direction);
-	}
-
+	}//Movement
 	public void DecreaseSpeed()
 	{
-		if(speed > 0)
+		if (speed > 0)
 		{
 			speed -= Time.deltaTime * Deceleration;
 		}
 
-	else if (speed < 0)
+		else if (speed < 0)
 		{
 			speed += Time.deltaTime * Deceleration;
 		}
-	}
+	}//Movement
 	public void IncreaseSpeed(float Direction)
 	{
-			speed += (Time.deltaTime * Acceleration) * Direction;
-			speed = Mathf.Clamp(speed, -MaxSpeed, MaxSpeed);
-	}
+		speed += (Time.deltaTime * Acceleration) * Direction;
+		speed = Mathf.Clamp(speed, -MaxSpeed, MaxSpeed);
+	}//Movement
+
+	public void Booster()
+	{
+		if (BoosterLVL < 1)
+		{
+			BoosterLVL += Time.deltaTime / BoostAcceleration;
+		}
+	}//Movement
+	public void UnBooste()
+	{
+		if (BoosterLVL > 0)
+		{
+			BoosterLVL -= Time.deltaTime / BoostDeceleration;
+		}
+	}//Movement
+	public void CallLanding()
+	{
+		Vector3 Landingpos = new Vector3();
+		if (GetFloor(out Landingpos))
+		{
+			StartCoroutine(Landing(Landingpos));
+		}
+	}//Movement
+
+
 	public Vector3 GetVelocity()
 	{
 		return rb.velocity;
-	}
-
-	public Vector3 GetWorldPosPointed()
-	{
-		return WorldPosPointed;
-	}
+	}//Data ?
 
 	public float GetSpeed()
 	{
 		return speed;
-	}
-
-
-	
+	}//Data ?
 	public void ChangeCamera()
 	{
 		if (FirstPersonCam.gameObject.activeInHierarchy)
 		{
 			FirstPersonCam.gameObject.SetActive(false);
 			ThirdPersonCam.gameObject.SetActive(true);
-			currentCamera = ThirdPersonCam;
+			CurrentCamera = ThirdPersonCam;
 		}
 
 		else
 		{
 			FirstPersonCam.gameObject.SetActive(true);
 			ThirdPersonCam.gameObject.SetActive(false);
-			currentCamera = FirstPersonCam;
+			CurrentCamera = FirstPersonCam;
 		}
-	}
-
+	}//Camera script
 	public Vector3 GetRotationAxis()
 	{
 		return new Vector3(mouseXAxis, mouseYAxis, 0);
-	}
-
-	//public void OnDrawGizmos()
-	//{
-	//	Vector3 RayDirection = shpashipUI.GetCursorRay().direction;
-	//	Vector3 TargetPos = transform.position + (RayDirection * CrossPointDistance);
-	//	Gizmos.DrawSphere(TargetPos, 2);
-	//}
-
-
+	}//Data ?
 	public float GetNormalizedSpeed()
 	{
 		return	((speed) / MaxSpeed);
-	}
-
-	public float GetNormalizedLife()
-	{
-		return (Life / LifeMax);
-	}
-
-
-	public float GetNormalizedShield()
-	{
-		return (Shield / ShieldMax);
-	}
-
+	}//Data ?
 	public float GetNormalizedVelocity()
 	{
 		return ((rb.velocity.magnitude) / (MaxVelocity + BoosterPower));
-	}
+	}//Data ?
+	
 
-	public void Booster()
-	{
-		if(BoosterLVL < 1)
-		{
-			BoosterLVL += Time.deltaTime / BoostAcceleration;
-		}
-	}
-	public void UnBooste()
-	{
-		if(BoosterLVL > 0)
-		{
-			BoosterLVL -= Time.deltaTime / BoostDeceleration;
-		}
-	}
-
-
-
-	public void CallLanding()
-	{
-		Vector3 Landingpos = new Vector3();
-		if(GetFloor(out Landingpos))
-		{
-			StartCoroutine(Landing( Landingpos));
-		}
-	}
 
 
 	public void LiftOff()
@@ -309,8 +255,7 @@ public class ShipController : MonoBehaviour
 		Rigidbody rb = GetComponent<Rigidbody>();
 		rb.AddForce(transform.up * liftingoffPower);
 
-	}
-
+	}//Landing ?
 	public IEnumerator Landing(Vector3 LandingPos)
 	{
 		ShipLanded = true;
@@ -324,9 +269,7 @@ public class ShipController : MonoBehaviour
 
 		rb.velocity = new Vector3(0, 0, 0);
 		rb.angularVelocity = new Vector3(0, 0, 0);
-	}
-
-
+	}//Landing ?
 	public bool GetFloor(out Vector3 LandingPos)
 	{
 		RaycastHit rayHit = new RaycastHit();
@@ -345,24 +288,15 @@ public class ShipController : MonoBehaviour
 		LandingPos = new Vector3();
 		return false;
 
-	}
+	}//Lanfing ?
 
 
-	public IEnumerator CoolDownRegenShield()
+	public override void OnGameOver()
 	{
-		yield return null;
+		rb.velocity = new Vector3();
 	}
 
-	public IEnumerator RegenShield(float Value)
-	{
-		while(Shield < ShieldMax)
-		{
-			Shield += Time.deltaTime;
-			yield return null;
-		}
 
-		Shield = ShieldMax;
-	//	StartCoroutine(RegenShield(Value));
-	}
+
 
 }

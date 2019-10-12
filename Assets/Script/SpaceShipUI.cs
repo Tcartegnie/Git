@@ -6,7 +6,9 @@ public class SpaceShipUI : MonoBehaviour
 {
 
 	public ShipController shipController;
-		 
+	public ShipState stateShip;
+
+	public Canvas SpaceshipUI;
 
 	public RectTransform ShipCursor;
 
@@ -18,24 +20,42 @@ public class SpaceShipUI : MonoBehaviour
 
 	public RectTransform ShieldBarMask;
 
+	
+
 	private void Start()
 	{
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
+		stateShip = shipController.ShipState;
+		stateShip.Gameover += GameOver;
 	}
 
 	// Update is called once per frame
 	void Update()
     {
-		Vector2 mouseAxis = shipController.GetRotationAxis();
+		if (shipController != null)
+		{
+			Vector2 mouseAxis = shipController.GetRotationAxis();
 
-		MoveCursor(mouseAxis.x, mouseAxis.y);
+			MoveCursor(mouseAxis.x, mouseAxis.y);
 
-		SetSpeedBar();
-		SetLifeBar();
-		SetShieldBar();
+			SetSpeedBar();
+			SetLifeBar();
+			SetShieldBar();
+		}
 		//Debug.DrawRay(shipController.transform.position, GetCursorRay().direction * 1000, Color.red);
 	} 
+
+	public void GameOver()
+	{
+		TurnOnOffDebugScreen(!SpaceshipUI.enabled);
+	}
+
+	public void TurnOnOffDebugScreen(bool State)
+	{
+		SpaceshipUI.enabled = State;
+	}
+
 
 	public void MoveCursor(float X, float Y)
 	{
@@ -48,7 +68,7 @@ public class SpaceShipUI : MonoBehaviour
 
 	public Ray GetCursorRay()//This must go in the part of the script
 	{
-		return ShipController.currentCamera.ScreenPointToRay(ShipCursor.position);
+		return ShipController.CurrentCamera.ScreenPointToRay(ShipCursor.position);
 	}
 
 
@@ -62,13 +82,13 @@ public class SpaceShipUI : MonoBehaviour
 
 	public void SetLifeBar()
 	{
-		float NormalizedLife =	shipController.GetNormalizedLife();
+		float NormalizedLife = stateShip.GetNormalizedLife();
 		LifeBarMask.anchorMax = new Vector2(NormalizedLife, 0.5f);
 	}
 
 	public void SetShieldBar()
 	{
-		float NormalizedShield = shipController.GetNormalizedShield();
+		float NormalizedShield = stateShip.GetNormalizedShield();
 		ShieldBarMask.anchorMax = new Vector2(NormalizedShield, 0.5f);
 	}
 

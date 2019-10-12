@@ -1,17 +1,18 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public class ShipShoot : ScriptableObject
+public class ShipShoot : MonoBehaviour
 {
 	public Canon LeftCanon;
 	public Canon RightCanon;
-	public void upadte()
+	public SpaceShipUI spaceShip;
+	public void Update()
 	{
 		if (Input.GetMouseButtonDown(0))
 		{
 			Shoot();
 		}
-		RotateCanon(new Vector3());
+		RotateCanon();
 	}
 
 
@@ -22,15 +23,15 @@ public class ShipShoot : ScriptableObject
 	}
 
 
-	public void RotateCanon(Vector3 Direction)
+	public void RotateCanon()
 	{
-		//Vector3 RayDirection = shpashipUI.GetCursorRay().direction;
+		Vector3 RayDirection = spaceShip.GetCursorRay().direction;
 		//		Vector3 TargetPos = transform.position + (RayDirection * CrossPointDistance);
 
 
 
-		LeftCanon.TargetPoint(Direction);
-		RightCanon.TargetPoint(Direction);
+		LeftCanon.TargetPoint(RayDirection);
+		RightCanon.TargetPoint(RayDirection);
 	}
 
 }
