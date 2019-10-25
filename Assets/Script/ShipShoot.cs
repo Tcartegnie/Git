@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 public class ShipShoot : MonoBehaviour
 {
-	public Canon LeftCanon;
-	public Canon RightCanon;
+
+	public List<Canon> canons;
 	public SpaceShipUI spaceShip;
 	public void Update()
 	{
@@ -18,8 +19,10 @@ public class ShipShoot : MonoBehaviour
 
 	public void Shoot()
 	{
-		LeftCanon.Shoot(0);
-		RightCanon.Shoot(0);
+		foreach(Canon canon in canons)
+		{
+			canon.Shoot(0);
+		}
 	}
 
 
@@ -29,9 +32,10 @@ public class ShipShoot : MonoBehaviour
 		//		Vector3 TargetPos = transform.position + (RayDirection * CrossPointDistance);
 
 
-
-		LeftCanon.TargetPoint(RayDirection);
-		RightCanon.TargetPoint(RayDirection);
+		foreach (Canon canon in canons)
+		{
+			canon.TargetPoint(RayDirection);
+		}
 	}
 
 }
