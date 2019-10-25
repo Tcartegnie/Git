@@ -4,35 +4,33 @@ using UnityEngine;
 
 public class Turret : Ship
 {
-	public Transform target;
 	public Canon canon;
 
-	public void Start()
-	{
-		StartCoroutine(ShootPlayer());
-	}
-	// Update is called once per frame
-	void Update()
-    {
-		LookAtTarget();
-	}
-
-	public void LookAtTarget()
+	public void LookAtTarget(Transform target)
 	{
 		transform.LookAt(target);
 	}
 
 	public void Shoot()
 	{
-		Debug.Log("Shoot");
 		canon.Shoot(0);
 	}
 
-	public IEnumerator ShootPlayer()
+	public void CallShoot()
+	{
+		StartCoroutine(StartShoot());
+	}
+
+	public IEnumerator StartShoot()
 	{
 		Shoot();
 		yield return new WaitForSeconds(canon.ShootCooldown);
-		StartCoroutine(ShootPlayer());
+		StartCoroutine(StartShoot());
+	}
+
+	public void StopShoot()
+	{
+		StopCoroutine(StartShoot());
 	}
 
 	public override void OnGameOver()
@@ -41,3 +39,4 @@ public class Turret : Ship
 	}
 
 }
+ 
