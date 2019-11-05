@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class SpaceShipUI : MonoBehaviour
 {
 
-	public ShipController shipController;
+	public ShipMovement shipController;
 	public ShipState stateShip;
 
 	public Canvas SpaceshipUI;
@@ -20,7 +20,7 @@ public class SpaceShipUI : MonoBehaviour
 
 	public RectTransform ShieldBarMask;
 
-	
+	public RectTransform CircleTarget;
 
 	private void Start()
 	{
@@ -68,7 +68,7 @@ public class SpaceShipUI : MonoBehaviour
 
 	public Ray GetCursorRay()//This must go in the part of the script
 	{
-		return ShipController.CurrentCamera.ScreenPointToRay(ShipCursor.position);
+		return ShipMovement.CurrentCamera.ScreenPointToRay(ShipCursor.position);
 	}
 
 
@@ -91,5 +91,6 @@ public class SpaceShipUI : MonoBehaviour
 		float NormalizedShield = stateShip.GetNormalizedShield();
 		ShieldBarMask.anchorMax = new Vector2(NormalizedShield, 0.5f);
 	}
+
 
 }

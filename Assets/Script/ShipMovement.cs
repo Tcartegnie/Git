@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class ShipController : Ship
+public class ShipMovement : Ship
 {
 	Rigidbody rb;
 	[Space]
@@ -30,8 +30,8 @@ public class ShipController : Ship
 	public float BoosterLVL;
 	public float BoosterPower;
 	[Space]
-	public float BoostAcceleration;
-	public float BoostDeceleration;
+	public float BoostMaxAccelerationTime;
+	public float BoosterMaxDecelerationTime;
 	[Space]
 	[Header("Landing")]
 	public float FloorMinDistance;
@@ -46,62 +46,11 @@ public class ShipController : Ship
 	{
 		rb = GetComponent<Rigidbody>();
 		CurrentCamera = ThirdPersonCam;
-	
-		//Cursor.lockState = CursorLockMode.Locked;
-
-	//Coroutine RegenCorroutine =	StartCoroutine(RegenShield(ShieldMax));
 	}
 
 	// Update is called once per frame
-	void Update()
+	void FixedUpdate()
 	{
-		if (!ShipState.IsGameover)
-		{
-			CallLateralAndForardMove();
-			CallMouseAxisInput();
-
-
-			if (Input.GetKey(KeyCode.LeftAlt))
-			{
-				ShipState.OnHit(1f);
-			}
-
-			if (Input.GetMouseButtonUp(1))
-			{
-				if (ShipLanded)
-				{
-					LiftOff();
-				}
-				else
-				{
-					CallLanding();
-				}
-			}
-
-			if (!ShipLanded)
-			{
-
-				CallAxisRotation();
-				if (Input.GetKeyUp(KeyCode.LeftControl))
-				{
-					ChangeCamera();
-				}
-
-				if (Input.GetKey(KeyCode.LeftShift))
-				{
-					Booster();
-				}
-				else
-				{
-					UnBooste();
-				}
-				//GetDirectionPoint();
-
-				MoveForwarde();
-			}
-
-			ShipState.ShieldCoolDownCompute();
-		}
 		rb.velocity = Vector3.ClampMagnitude(rb.velocity, (MaxVelocity + GetBoosterValue()));
 	}
 
@@ -116,12 +65,8 @@ public class ShipController : Ship
 		mouseYAxis = Mathf.Clamp(mouseYAxis, -1, +1);
 	}
 
-	public void CallLateralAndForardMove()
+	public void CallLateralAndForardMove(float forwardInputValue, float horizontalInputValue)
 	{
-		float forwardInputValue = Input.GetAxis("Vertical");
-		float horizontalInputValue = Input.GetAxis("Horizontal");
-
-
 		if (forwardInputValue != 0 || horizontalInputValue != 0)
 		{
 			Straff(horizontalInputValue);
@@ -144,7 +89,7 @@ public class ShipController : Ship
 	}
 
 
-	void MoveForwarde()
+	public void MoveForwarde()
 	{
 		rb.velocity += transform.forward * (Time.deltaTime * (speed + GetBoosterValue()));
 	}//Movement
@@ -186,14 +131,14 @@ public class ShipController : Ship
 	{
 		if (BoosterLVL < 1)
 		{
-			BoosterLVL += Time.deltaTime / BoostAcceleration;
+			BoosterLVL += Time.deltaTime / BoostMaxAccelerationTime;
 		}
 	}//Movement
 	public void UnBooste()
 	{
 		if (BoosterLVL > 0)
 		{
-			BoosterLVL -= Time.deltaTime / BoostDeceleration;
+			BoosterLVL -= Time.deltaTime / BoosterMaxDecelerationTime;
 		}
 	}//Movement
 	public void CallLanding()

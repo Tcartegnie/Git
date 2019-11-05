@@ -7,7 +7,7 @@ public class DebugScreen : MonoBehaviour
 {
 
 	public	Canvas DebugCanvas;
-	public ShipController Currentship;
+	public ShipMovement Currentship;
 	public Text SpeedShip;
 	public Text VelocityShip;
 	public Text ScreenWorldPos;
