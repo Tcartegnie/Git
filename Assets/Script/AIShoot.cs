@@ -50,8 +50,7 @@ public class AIShoot : MonoBehaviour
 	{
 		foreach(Canon canon in Canons)
 		{
-			
-			canon.Shoot();
+			canon.Shoot(0);
 		}
 	}
 

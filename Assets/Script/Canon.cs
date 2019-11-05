@@ -7,8 +7,6 @@ public class Canon : MonoBehaviour
 
 	public GameObject Bullet;
 	public float ShootCooldown;
-	public float Damage;
-	public float Speed;
 	public Transform CanonForward;
 	bool CanShoot = true;
 
@@ -17,13 +15,12 @@ public class Canon : MonoBehaviour
 		transform.rotation = Quaternion.LookRotation(Point);
 	}
 
-	public void Shoot()
+	public void Shoot(float ShipSpeed)
 	{
 		if (CanShoot)
 		{
 			GameObject GO = Instantiate(Bullet, CanonForward.position, CanonForward.rotation);
-			GO.GetComponent<Bullet>().Speed = Speed;
-			GO.GetComponent<Bullet>().SetDamage(Damage);
+			GO.GetComponent<Bullet>().speed += ShipSpeed;
 			CanShoot = false;
 			StartCoroutine(CoolDownShoot());
 		}

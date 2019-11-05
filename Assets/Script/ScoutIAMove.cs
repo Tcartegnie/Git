@@ -10,22 +10,11 @@ public class ScoutIAMove : MonoBehaviour
 	public float RayCastRange;
 	public float rotationRange;
 	public float Speed;
-	public Rigidbody rb;
-	//Faire une state machine ?
-	//Faire un truc fonctionelle ?
-	// Update is called once per frame
-	private void Start()
-	{
-		rb = GetComponent<Rigidbody>();
-	}
+    
 
-	void Update()
+    // Update is called once per frame
+    void Update()
     {
-
-			Vector3 pos = target.position - transform.position;
-			Debug.DrawRay(transform.position, target.position, Color.blue);
-		
-		//Turn();
 		MoveInDirection(transform.forward);
 		FollowTarget();
     }
@@ -33,16 +22,14 @@ public class ScoutIAMove : MonoBehaviour
 
 	void Turn()
 	{
-		//Debug.Log("Rotate around player");
 		Vector3 pos = target.position - transform.position;
 		Quaternion rotation = Quaternion.LookRotation(pos);
-		transform.rotation = Quaternion.Slerp(transform.rotation,rotation, rotationRange * (Time.deltaTime));
+		transform.rotation = Quaternion.Slerp(transform.rotation,rotation, rotationRange * Time.deltaTime);
 	}
 
 	public void MoveInDirection(Vector3 Direction)
 	{
-		rb.velocity += Direction * (Time.deltaTime * Speed);
-		rb.velocity = Vector3.ClampMagnitude(rb.velocity, Speed);
+		transform.position += Direction * (Time.deltaTime*Speed); 
 	}
 
 	public void FollowTarget()
@@ -75,8 +62,6 @@ public class ScoutIAMove : MonoBehaviour
 			rayCastOffset -= Vector3.up;
 		}
 
-
-		//Debug.Log("RaycastOffset value : " + rayCastOffset);
 
 		if (rayCastOffset != Vector3.zero)
 			transform.Rotate(rayCastOffset * 5f * Time.deltaTime);

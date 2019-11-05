@@ -8,13 +8,12 @@ public class Turret : Ship
 
 	public void LookAtTarget(Transform target)
 	{
-		//Faire de la predicate pour essayé d'ancitiper le target du joueur
 		transform.LookAt(target);
 	}
 
 	public void Shoot()
 	{
-		canon.Shoot();
+		canon.Shoot(0);
 	}
 
 	public void CallShoot()
