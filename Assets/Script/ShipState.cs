@@ -11,6 +11,8 @@ public class ShipState : MonoBehaviour
 
 	public GameObject Ship;
 
+	GameObject targetLocked;
+
 	public float Life;
 	public float LifeMax;
 
@@ -26,6 +28,7 @@ public class ShipState : MonoBehaviour
 	float ShieldCoolDown;
 	public float ShieldCoolDownMax;
 
+	public GameObject TargetLocked { get => targetLocked; set => targetLocked = value; }
 
 	public void OnHit(float Damage)
 	{
@@ -84,11 +87,13 @@ public class ShipState : MonoBehaviour
 	{
 		return (Life / LifeMax);
 	}
+
 	public float GetNormalizedShield()
 	{
 		return (Shield / ShieldMax);
 	}
 
+	
 	
 
 }
