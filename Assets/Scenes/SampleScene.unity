@@ -970,6 +970,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fd783c1371697f44b7affe1d7bea054, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &550258196 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5272169476636150290, guid: 9f36af7d256c8cd48a066b36bcef2ae2,
+    type: 3}
+  m_PrefabInstance: {fileID: 1185279335}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &550807983
 GameObject:
   m_ObjectHideFlags: 0
@@ -1354,6 +1360,14 @@ PrefabInstance:
       propertyPath: canons.Array.data[1]
       value: 
       objectReference: {fileID: 501723817}
+    - target: {fileID: 1159136208, guid: 7049a336c6ee74a32984d27e6d9faeca, type: 3}
+      propertyPath: ShipState
+      value: 
+      objectReference: {fileID: 1159136207}
+    - target: {fileID: 1159136208, guid: 7049a336c6ee74a32984d27e6d9faeca, type: 3}
+      propertyPath: spaceShipUI
+      value: 
+      objectReference: {fileID: 1157122258}
     - target: {fileID: 125932475089092997, guid: 7049a336c6ee74a32984d27e6d9faeca,
         type: 3}
       propertyPath: ShootCooldown
@@ -1391,6 +1405,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1159136207, guid: 7049a336c6ee74a32984d27e6d9faeca, type: 3}
+      propertyPath: targetLocked
+      value: 
+      objectReference: {fileID: 550258196}
     m_RemovedComponents:
     - {fileID: 1159136208, guid: 7049a336c6ee74a32984d27e6d9faeca, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7049a336c6ee74a32984d27e6d9faeca, type: 3}
@@ -2533,7 +2551,7 @@ MonoBehaviour:
   - {fileID: 944890373}
   - {fileID: 501723817}
   - {fileID: 1659110587}
-  spaceShip: {fileID: 1157122258}
+  spaceShipUI: {fileID: 1157122258}
 --- !u!1 &1183633509
 GameObject:
   m_ObjectHideFlags: 0
@@ -3693,7 +3711,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.4}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
