@@ -93,4 +93,11 @@ public class SpaceShipUI : MonoBehaviour
 	}
 
 
+	public void SetPredicatedLock(Vector3 PredicatedPosition)
+	{
+		Camera currentcamera = ShipMovement.CurrentCamera;
+		Vector3 predicatedPositionOnScreen = currentcamera.WorldToScreenPoint(PredicatedPosition);
+		CircleTarget.position = predicatedPositionOnScreen;
+	}
+
 }

@@ -11,7 +11,7 @@ public class ShipState : MonoBehaviour
 
 	public GameObject Ship;
 
-	GameObject targetLocked;
+	public GameObject targetLocked;
 
 	public float Life;
 	public float LifeMax;
