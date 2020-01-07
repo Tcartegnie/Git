@@ -7,7 +7,7 @@ public class ShipInput : Ship
 	public ShipMovement Shipcontroller;
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
 		float forwardInputValue = Input.GetAxis("Vertical");
 		float horizontalInputValue = Input.GetAxis("Horizontal");
@@ -17,22 +17,6 @@ public class ShipInput : Ship
 
 		if (!ShipState.IsGameover)
 		{
-
-			if (Input.GetMouseButtonUp(1))
-			{
-				if (Shipcontroller.ShipLanded)
-				{
-					Shipcontroller.LiftOff();
-				}
-				else
-				{
-					Shipcontroller.CallLanding();
-				}
-			}
-
-			if (!Shipcontroller.ShipLanded)
-			{
-
 				Shipcontroller.CallAxisRotation();
 				if (Input.GetKeyUp(KeyCode.LeftControl))
 				{
@@ -50,7 +34,6 @@ public class ShipInput : Ship
 				//GetDirectionPoint();
 
 				Shipcontroller.MoveForwarde();
-			}
 
 			ShipState.ShieldCoolDownCompute();
 		}
