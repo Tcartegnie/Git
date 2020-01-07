@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1021522972}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.58, z: 9.77}
+  m_LocalPosition: {x: 0, y: 0.58, z: 7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4544973855606162}
@@ -41,7 +41,6 @@ GameObject:
   - component: {fileID: 4352267153158902}
   - component: {fileID: 33396990863127720}
   - component: {fileID: 23433015480376818}
-  - component: {fileID: 1677266460}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -110,20 +109,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &1677266460
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1520627223689490}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 1
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 4300000, guid: d7fcbff04d2a74555be8772f47c0f0de, type: 3}
 --- !u!1 &1542112843390278
 GameObject:
   m_ObjectHideFlags: 0
@@ -173,9 +158,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a20436723ba144288cfc2f63752559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShipState: {fileID: 1568634365}
-  target: {fileID: 0}
   canon: {fileID: 6625887061508728345}
+  shipstate: {fileID: 1568634365}
 --- !u!114 &6625887061508728345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,8 +174,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Bullet: {fileID: 4124465651914778250, guid: e41f49c6e60851240b3439e2199e85e6, type: 3}
   ShootCooldown: 2
+  Damage: 0
+  Speed: 0
   CanonForward: {fileID: 1021522973}
-  Yoffset: 0
 --- !u!114 &1568634365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,6 +190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Ship: {fileID: 1542112843390278}
+  targetLocked: {fileID: 0}
   Life: 30
   LifeMax: 30
   Shield: 30
@@ -240,5 +226,5 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 126
   m_CollisionDetection: 0
