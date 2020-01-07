@@ -50,13 +50,17 @@ public class ShipShoot : Ship
 		Ray ray = new Ray(transform.position, spaceShipUI.GetCursorRay().direction);
 		if(Physics.Raycast(ray,out rayHit))
 		{
-		
-				GameObject target = rayHit.collider.gameObject;
+			GameObject target = rayHit.collider.gameObject;
+
+			if (target.GetComponentInParent<ShipState>() != null)
+			{
 				ShipState.TargetLocked = target;
 				OnTargetLocked();
 				Debug.Log("Target is : " + target.name);
-				target.GetComponentInParent<Ship>().visibility += OnTargetLocked;
-				target.GetComponentInParent<Ship>().Novisibility += OnTargetLost;
+				ShipState stat = target.GetComponentInParent<ShipState>();
+				stat.visibility += OnTargetLocked;
+				stat.Novisibility += OnTargetLost;
+			}
 		}
 
 	}//I another script ?
