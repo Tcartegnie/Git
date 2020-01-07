@@ -36,7 +36,7 @@ public class Bullet : MonoBehaviour
 
 	public void MoveForward()
 	{
-		RB.velocity = transform.forward *  Speed;
+		RB.velocity = transform.forward *  (Speed);
 	}
 
 	public void SetDamage(float damage)
