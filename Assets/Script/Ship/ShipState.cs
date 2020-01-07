@@ -7,7 +7,9 @@ public class ShipState : MonoBehaviour
 
 	public delegate void OnGameOver();
 
+
 	public OnGameOver Gameover;
+	
 
 	public GameObject Ship;
 
@@ -27,6 +29,7 @@ public class ShipState : MonoBehaviour
 
 	float ShieldCoolDown;
 	public float ShieldCoolDownMax;
+	public bool AutomatedShootEnable;
 
 	public GameObject TargetLocked { get => targetLocked; set => targetLocked = value; }
 
