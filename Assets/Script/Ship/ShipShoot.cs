@@ -52,12 +52,12 @@ public class ShipShoot : Ship
 		{
 			GameObject target = rayHit.collider.gameObject;
 
-			if (target.GetComponentInParent<ShipState>() != null)
+			if (target.GetComponentInParent<ShipRendering>() != null)
 			{
 				ShipState.TargetLocked = target;
 				OnTargetLocked();
 				Debug.Log("Target is : " + target.name);
-				ShipState stat = target.GetComponentInParent<ShipState>();
+				ShipRendering stat = target.GetComponent<ShipRendering>();
 				stat.visibility += OnTargetLocked;
 				stat.Novisibility += OnTargetLost;
 			}

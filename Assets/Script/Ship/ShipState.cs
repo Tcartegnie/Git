@@ -5,9 +5,8 @@ using UnityEngine;
 public class ShipState : MonoBehaviour
 {
 
-	public delegate void Visibility();
-	public Visibility visibility;
-	public Visibility Novisibility;
+
+
 
 	public delegate void OnGameOver();
 
@@ -99,17 +98,6 @@ public class ShipState : MonoBehaviour
 	}
 
 
-	private void OnBecameVisible()
-	{
-		Debug.Log("Im in the camera");
-		visibility?.Invoke();
-	}
-
-	private void OnBecameInvisible()
-	{
-		Debug.Log("Im out of the camera");
-		Novisibility?.Invoke();
-	}
 
 
 }
