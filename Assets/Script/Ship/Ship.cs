@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class Ship : MonoBehaviour
 {
-
+	public delegate void Visibility();
+	public Visibility visibility;
+	public Visibility Novisibility;
 	public ShipState ShipState;
 	// Start is called before the first frame update
-	void Start()
+	protected void Start()
     {
 		ShipState.Gameover += OnGameOver;
 	}
@@ -15,4 +17,13 @@ public class Ship : MonoBehaviour
 	public virtual void OnGameOver()
 	{ }
 
+	private void OnBecameVisible()
+	{
+		visibility?.Invoke();
+	}
+
+	private void OnBecameInvisible()
+	{
+		Novisibility?.Invoke();
+	}
 }
