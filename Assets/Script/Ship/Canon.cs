@@ -6,22 +6,22 @@ public class Canon : MonoBehaviour
 {
 
 	public GameObject Bullet;
-	public float ShootCooldown;
+	public Transform CanonOffset;
+	public float CoolDown;
 	public float Damage;
 	public float Speed;
-	public Transform CanonForward;
 	bool CanShoot = true;
 
-	public void TargetPoint(Vector3 Point)
+	public void TargetPoint(Vector3 targetedpoint)
 	{
-		transform.rotation = Quaternion.LookRotation(Point);
+		transform.rotation = Quaternion.LookRotation(targetedpoint);
 	}
 
 	public void Shoot()
 	{
 		if (CanShoot)
 		{
-			GameObject GO = Instantiate(Bullet, CanonForward.position, CanonForward.rotation);
+			GameObject GO = Instantiate(Bullet, CanonOffset.position, CanonOffset.rotation);
 			GO.GetComponent<Bullet>().Speed = Speed;
 			GO.GetComponent<Bullet>().SetDamage(Damage);
 			CanShoot = false;
@@ -29,9 +29,11 @@ public class Canon : MonoBehaviour
 		}
 	}
 
+
 	public IEnumerator CoolDownShoot()
 	{
-		yield return new WaitForSeconds(ShootCooldown);
+		yield return new WaitForSeconds(CoolDown);
 		CanShoot = true;
 	}
+
 }
