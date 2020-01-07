@@ -8,8 +8,10 @@ public class AsteroïdField : MonoBehaviour
 	public GameObject asteroide;
 	public float NumberOfAsteroid;
 	public int RangeOfField;
-	public IAMove scoutIAmove;
 	//Generate a random objectfield.
+	List<GameObject> asteroids = new List<GameObject>();
+
+	public List<GameObject> Asteroids { get => asteroids; set => asteroids = value; }
 
 	private void Start()
 	{
@@ -29,7 +31,7 @@ public class AsteroïdField : MonoBehaviour
 	public void GenerateAsteroide(Vector3 Position)
 	{
 		GameObject GO = Instantiate(asteroide, Position, new Quaternion());
-		scoutIAmove.colliders.Add(GO);
+		Asteroids.Add(GO);
 	}
 
 }
