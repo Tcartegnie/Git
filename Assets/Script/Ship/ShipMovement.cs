@@ -14,8 +14,7 @@ public class ShipMovement : Ship
 	public float Deceleration;
 	[Space]
 	[Header("Speed")]
-	private float speed;
-	public float MaxVelocity;
+	private float Speed;
 	public float MaxSpeed;
 
 	public float Straffspeed;
@@ -32,16 +31,9 @@ public class ShipMovement : Ship
 	[Space]
 	public float BoostMaxAccelerationTime;
 	public float BoosterMaxDecelerationTime;
-	[Space]
-	[Header("Landing")]
-	public float FloorMinDistance;
+
 	public Vector2 AxisSensitivity;
-	public bool ShipLanded;
 
-	//Poissible class for shoot only
-
-
-	// Start is called before the first frame update
 	void Start()
 	{
 		rb = GetComponent<Rigidbody>();
@@ -51,13 +43,13 @@ public class ShipMovement : Ship
 	// Update is called once per frame
 	void FixedUpdate()
 	{
-		rb.velocity = Vector3.ClampMagnitude(rb.velocity, (MaxVelocity + GetBoosterValue()));
+		float MaxVelocity = MaxSpeed + GetBoosterValue();
+		rb.velocity = Vector3.ClampMagnitude(rb.velocity, MaxVelocity);
 	}
 
 
 	public void CallMouseAxisInput()
 	{
-	
 		mouseXAxis += Input.GetAxis("Mouse X") * (Time.deltaTime * AxisSensitivity.x);
 		mouseXAxis = Mathf.Clamp(mouseXAxis, -1, +1);
 
@@ -69,14 +61,14 @@ public class ShipMovement : Ship
 	{
 		if (forwardInputValue != 0 || horizontalInputValue != 0)
 		{
-			Straff(horizontalInputValue);
+			Straff(transform.right,horizontalInputValue);
 			IncreaseSpeed(forwardInputValue);
-			rb.drag = 0;
+			//rb.drag = 0.5f;
 		}
 		else
 		{
 			DecreaseSpeed();
-			rb.drag = 2;
+			//rb.drag = 2;
 		}
 	}
 
@@ -91,41 +83,42 @@ public class ShipMovement : Ship
 
 	public void MoveForwarde()
 	{
-		rb.velocity += transform.forward * (Time.deltaTime * (speed + GetBoosterValue()));
-	}//Movement
+		rb.AddForce(transform.forward * ((Speed) + GetBoosterValue()));
+	}
+
 	void TurnOnAxis(Vector3 RotaionAxis, float Direction, float Magnitude)
 	{
 		rb.angularVelocity += (RotaionAxis * (Time.deltaTime * Magnitude) * Direction);
-	}//Movement
+	}
+
 	public float GetBoosterValue()
 	{
 		return BoosterPower * BoosterLVL;
 	}
-	void Straff(float direction)
+
+	void Straff(Vector3 direction,float magnitude)
 	{
-		rb.velocity += (transform.right * (Time.deltaTime * Straffspeed)) * direction;
-	}//Movement
-	void MoveUp(float Direction, float Speed)
-	{
-		rb.velocity += (transform.up * (Time.deltaTime * Speed) * Direction);
-	}//Movement
+		rb.AddForce((direction * (Time.deltaTime * Straffspeed)) * magnitude);
+	}
+
 	public void DecreaseSpeed()
 	{
-		if (speed > 0)
+		if (Speed > 0)
 		{
-			speed -= Time.deltaTime * Deceleration;
+			Speed -= Time.deltaTime * Deceleration;
 		}
 
-		else if (speed < 0)
+		else if (Speed < 0)
 		{
-			speed += Time.deltaTime * Deceleration;
+			Speed += Time.deltaTime * Deceleration;
 		}
-	}//Movement
+	}
+
 	public void IncreaseSpeed(float Direction)
 	{
-		speed += (Time.deltaTime * Acceleration) * Direction;
-		speed = Mathf.Clamp(speed, -MaxSpeed, MaxSpeed);
-	}//Movement
+		Speed += (Time.deltaTime * Acceleration) * Direction;
+		Speed = Mathf.Clamp(Speed, -Acceleration, Acceleration);
+	}
 
 	public void Booster()
 	{
@@ -133,33 +126,33 @@ public class ShipMovement : Ship
 		{
 			BoosterLVL += Time.deltaTime / BoostMaxAccelerationTime;
 		}
-	}//Movement
+		BoosterLVL = Mathf.Clamp(BoosterLVL, 0,1);
+
+	}
+
+
 	public void UnBooste()
 	{
 		if (BoosterLVL > 0)
 		{
 			BoosterLVL -= Time.deltaTime / BoosterMaxDecelerationTime;
 		}
-	}//Movement
-	public void CallLanding()
-	{
-		Vector3 Landingpos = new Vector3();
-		if (GetFloor(out Landingpos))
-		{
-			StartCoroutine(Landing(Landingpos));
-		}
-	}//Movement
+
+		BoosterLVL = Mathf.Clamp(BoosterLVL, 0, 1);
+	}
+
 
 
 	public Vector3 GetVelocity()
 	{
 		return rb.velocity;
-	}//Data ?
+	}
 
 	public float GetSpeed()
 	{
-		return speed;
-	}//Data ?
+		return Speed;
+	}
+
 	public void ChangeCamera()
 	{
 		if (FirstPersonCam.gameObject.activeInHierarchy)
@@ -175,73 +168,27 @@ public class ShipMovement : Ship
 			ThirdPersonCam.gameObject.SetActive(false);
 			CurrentCamera = FirstPersonCam;
 		}
-	}//Camera script
+	}//Camera script//UI ?
+
+
 	public Vector3 GetRotationAxis()
 	{
 		return new Vector3(mouseXAxis, mouseYAxis, 0);
-	}//Data ?
-	public float GetNormalizedSpeed()
-	{
-		return	((speed) / MaxSpeed);
-	}//Data ?
+	}
+
 	public float GetNormalizedVelocity()
 	{
-		return ((rb.velocity.magnitude) / (MaxVelocity + BoosterPower));
-	}//Data ?
-	
+		return (GetVeloctiyMagnitude() / (MaxSpeed));
+	}
 
-
-
-	public void LiftOff()
+	public float GetVeloctiyMagnitude()
 	{
-
-		ShipLanded = false;
-		Vector3 CurrentPos = transform.position;
-		Rigidbody rb = GetComponent<Rigidbody>();
-		rb.AddForce(transform.up * liftingoffPower);
-
-	}//Landing ?
-	public IEnumerator Landing(Vector3 LandingPos)
-	{
-		ShipLanded = true;
-		Vector3 CurrentPos = transform.position;
-
-		for (float i = 0; i < 1; i += Time.deltaTime)
-		{
-			transform.position = Vector3.Lerp(CurrentPos,LandingPos + transform.up,i);
-			yield return null;
-		}
-
-		rb.velocity = new Vector3(0, 0, 0);
-		rb.angularVelocity = new Vector3(0, 0, 0);
-	}//Landing ?
-	public bool GetFloor(out Vector3 LandingPos)
-	{
-		RaycastHit rayHit = new RaycastHit();
-		Ray ray = new Ray(transform.position,-(transform.up));
-
-		if(Physics.Raycast(ray,out rayHit, FloorMinDistance))
-		{
-			Debug.Log("The floor is touched");
-			Debug.DrawRay(transform.position, -(transform.up * FloorMinDistance),Color.green,100f);
-
-			LandingPos = rayHit.point;
-
-			return true;
-		}
-
-		LandingPos = new Vector3();
-		return false;
-
-	}//Lanfing ?
-
+		return rb.velocity.magnitude;
+	}
 
 	public override void OnGameOver()
 	{
 		rb.velocity = new Vector3();
 	}
-
-
-
-
 }
+                
