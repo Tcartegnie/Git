@@ -5,20 +5,20 @@ using UnityEngine;
 public class ShipState : MonoBehaviour
 {
 
+	public delegate void Visibility();
+	public Visibility visibility;
+	public Visibility Novisibility;
+
 	public delegate void OnGameOver();
 
 
 	public OnGameOver Gameover;
 	
 
-	public GameObject Ship;
-
 	public GameObject targetLocked;
 
 	public float Life;
 	public float LifeMax;
-
-	float ShieldRegenTime;
 
 	public float Shield;
 	public float ShieldMax;
@@ -32,6 +32,8 @@ public class ShipState : MonoBehaviour
 	public bool AutomatedShootEnable;
 
 	public GameObject TargetLocked { get => targetLocked; set => targetLocked = value; }
+
+
 
 	public void OnHit(float Damage)
 	{
@@ -68,7 +70,7 @@ public class ShipState : MonoBehaviour
 
 	public void ShipExplosion()
 	{
-		Destroy(Ship.gameObject);
+		Destroy(gameObject);
 		IsGameover = true;
 		Gameover();
 	}
@@ -96,7 +98,18 @@ public class ShipState : MonoBehaviour
 		return (Shield / ShieldMax);
 	}
 
-	
-	
+
+	private void OnBecameVisible()
+	{
+		Debug.Log("Im in the camera");
+		visibility?.Invoke();
+	}
+
+	private void OnBecameInvisible()
+	{
+		Debug.Log("Im out of the camera");
+		Novisibility?.Invoke();
+	}
+
 
 }
