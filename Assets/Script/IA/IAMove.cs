@@ -14,7 +14,7 @@ public enum State
 	Destroy,
 }
 
-public class IAMove : Ship
+public class IAMove : MonoBehaviour
 {
 	public Transform target;
 	public float RayCastOffset;
