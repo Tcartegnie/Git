@@ -183,7 +183,11 @@ public class ShipMovement : Ship
 
 	public float GetVeloctiyMagnitude()
 	{
-		return rb.velocity.magnitude;
+		if (rb != null)
+		{
+			return rb.velocity.magnitude;
+		}
+		return 0.0f;
 	}
 
 	public override void OnGameOver()
