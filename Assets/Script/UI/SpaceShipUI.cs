@@ -34,7 +34,8 @@ public class SpaceShipUI : MonoBehaviour
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 		stateShip = shipController.ShipState;
-		stateShip.Gameover += GameOver;
+		GameManager GM = GameManager.instance;	
+		GM.onGamover += GameOver;
 	}
 
 	// Update is called once per frame

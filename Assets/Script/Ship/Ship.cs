@@ -9,7 +9,8 @@ public class Ship : MonoBehaviour
 	// Start is called before the first frame update
 	protected void Start()
     {
-		ShipState.Gameover += OnGameOver;
+		GameManager GM = GameManager.instance;
+		GM.onGamover += OnGameOver;
 	}
 
 	public virtual void OnGameOver()

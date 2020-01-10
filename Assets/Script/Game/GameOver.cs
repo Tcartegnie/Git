@@ -10,10 +10,12 @@ public class GameOver : MonoBehaviour
 	public Image image;
 	public Text GameOverText;
 	public RectTransform ButtonRect;
-	public ShipState shipstate;
+	public GameManager GM;
+
 	public void Start()
 	{
-		shipstate.Gameover += FadeGameOver;
+		GM = GameManager.instance;
+		GM.onGamover += FadeGameOver;
 	}
 
 	public void FadeGameOver()
@@ -25,7 +27,6 @@ public class GameOver : MonoBehaviour
 	{
 		for(float time = 0.0f; time < 1; time+= Time.deltaTime/FadeTime)
 		{
-		
 			image.color = new Color(0,0,0,time);
 			Color color = GameOverText.color;
 			GameOverText.color = new Color(color.a,color.b,color.g,time);

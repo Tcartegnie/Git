@@ -18,7 +18,8 @@ public class Turret : MonoBehaviour
 
 	public void Start()
 	{
-		shipstate.Gameover += OnGameOver;
+		GameManager GM = GameManager.instance;
+		GM.onGamover += OnGameOver;
 	}
 
 	public void LookAtTarget()

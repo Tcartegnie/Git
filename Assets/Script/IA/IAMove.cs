@@ -54,7 +54,7 @@ public class IAMove : MonoBehaviour
 	{
 		rb = GetComponent<Rigidbody>();
 		state = State.Search;
-		seek = new Seek(transform,target,rb,MaxSpeed,1,0);
+		seek = new Seek(transform,target,rb,MaxSpeed,1,0, new Vector3(-10,-10,0));
 		flee = new Flee(transform, target, rb, MaxSpeed,1);
 		arrival = new Arrival(transform, target, rb, MaxSpeed,0.5f,SlowingDIstance, MaxDistanceFromTarget);
 		pursuite = new Pursuite(transform, target, rb, MaxSpeed,1, MaxDistanceFromTarget);
@@ -130,7 +130,7 @@ public class IAMove : MonoBehaviour
 
 			case (State.Destroy):
 				CurrentBehaviours.Add(obstacleAvoidance);
-				CurrentBehaviours.Add(arrival);
+				CurrentBehaviours.Add(seek);
 				CurrentBehaviours.Add(separation);
 				break;
 		}
