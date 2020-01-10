@@ -8,11 +8,11 @@ public class ShipState : MonoBehaviour
 
 
 
-	public delegate void OnGameOver();
 
+	public delegate void OnShipDestroy(GameObject ship);
 
-	public OnGameOver Gameover;
-	
+	public OnShipDestroy ShipDestroy;
+
 
 	public GameObject targetLocked;
 
@@ -31,7 +31,6 @@ public class ShipState : MonoBehaviour
 	public bool AutomatedShootEnable;
 
 	public GameObject TargetLocked { get => targetLocked; set => targetLocked = value; }
-
 
 
 	public void OnHit(float Damage)
@@ -71,7 +70,7 @@ public class ShipState : MonoBehaviour
 	{
 		Destroy(gameObject);
 		IsGameover = true;
-		Gameover();
+		ShipDestroy?.Invoke(gameObject);
 	}
 
 	public void ShieldCoolDownCompute()
@@ -96,8 +95,6 @@ public class ShipState : MonoBehaviour
 	{
 		return (Shield / ShieldMax);
 	}
-
-
 
 
 }
