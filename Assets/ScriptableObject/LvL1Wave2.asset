@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b78fbc7e57db6b6469fc337a83cc1be7, type: 3}
-  m_Name: Lvl1Wave1
+  m_Name: LvL1Wave2
   m_EditorClassIdentifier: 
-  shipTypes: 00000000
+  shipTypes: 0000000000000000
