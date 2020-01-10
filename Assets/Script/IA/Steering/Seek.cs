@@ -5,12 +5,16 @@ using UnityEngine;
 public class Seek : Steering
 {
 	float ReachDistanceOffset = 0;
-	public Seek(Transform entityTr, Transform targetTr, Rigidbody RB, float MaxSpeed, float Wheight, float ReachDistanceOffset) : base(entityTr, targetTr, RB, MaxSpeed,Wheight){}
+	Vector3 offset;
+	public Seek(Transform entityTr, Transform targetTr, Rigidbody RB, float MaxSpeed, float Wheight, float ReachDistanceOffset, Vector3 offset) : base(entityTr, targetTr, RB, MaxSpeed,Wheight)
+	{
+		this.offset = offset; 
+	}
 	
 
 	public Vector3 ComputeSteering()
 	{
-		Vector3 desiredVelocity = TargetTr.position - EntityTr.position;
+		Vector3 desiredVelocity = (TargetTr.position + ComputeOffset()) - EntityTr.position;
 		desiredVelocity.Normalize();
 		desiredVelocity *= MaxSpeed;
 
@@ -20,7 +24,7 @@ public class Seek : Steering
 
 	public Vector3 ComputeSteering(Vector3 targetPosition)
 	{
-		Vector3 desiredVelocity = ((targetPosition - EntityTr.position));//Get the direction
+		Vector3 desiredVelocity = (((targetPosition + ComputeOffset()) - EntityTr.position));//Get the direction
 		desiredVelocity.Normalize();
 		desiredVelocity *= MaxSpeed;
 
@@ -37,6 +41,16 @@ public class Seek : Steering
 			return true;
 		}
 		return false;
+	}
+
+	public Vector3 ComputeOffset()
+	{
+		Vector3 FinalOffset =	new Vector3(
+		 TargetTr.right.x + offset.x,
+		 TargetTr.up.y + offset.y,
+		 TargetTr.forward.z + offset.z
+		 );
+		return FinalOffset;
 	}
 
 
