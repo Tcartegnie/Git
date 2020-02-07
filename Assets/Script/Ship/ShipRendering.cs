@@ -11,13 +11,11 @@ public class ShipRendering : MonoBehaviour
 
 	private void OnBecameVisible()
 	{
-		Debug.Log("Im in the camera");
 		visibility?.Invoke();
 	}
 
 	private void OnBecameInvisible()
 	{
-		Debug.Log("Im out of the camera");
 		Novisibility?.Invoke();
 	}
 
