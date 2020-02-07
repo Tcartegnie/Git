@@ -16,25 +16,31 @@ public enum State
 
 public class IAMove : MonoBehaviour
 {
+	[Header("Generale")]
 	public Transform target;
-	public float RayCastOffset;
-	public float RayCastRange;
-	public float rotationRange;
-	public float Speed;
-	public float PursuiteRadius;
+	public Rigidbody rb;
 	public float MaxSpeed;
+	public float MaxDistanceFromTarget;
+	public float DetectionRange;
+	public float AttackModeRange;
+
+
+	[Space]
+	[Header("Obstacle avoidance")]
 	public float MAXAHEAD;
 	public float MaxAvoidanceForce;
-	public float MaxDistanceFromTarget;
-	public float SlowingDIstance;
+	public List<GameObject> colliders = new List<GameObject>();
+	[Space]
+	[Header("Arrival")]
+	public float SlowingDistance;
+	public Vector3 TargetOffset = new Vector3();
+	[Space]
+	[Header("Wanders")]
 	public float RadiusWanders;
 	public float LittleRadiusWanders;
-	public Rigidbody rb;
-	public State state;
-	public List<GameObject> colliders = new List<GameObject>();
-	public Vector3 TargetOffset = new Vector3();
+	[Space]
+	[Header("Separation")]
 	public float SeparationStrenght;
-
 	public float AvoidTargetDistance;
 
 	public delegate void RemoveFromSeparation(Transform transform);
@@ -50,30 +56,94 @@ public class IAMove : MonoBehaviour
 	ObstacleAvoidance obstacleAvoidance;
 	Separation separation;
 	Wanders wanders;
+
+	BehaviourTreeConstructor BTconstructor;
+	IBehaviourTreeNode BTCloseTarget;
+	BehaviourTreeConstructor BTFarTarget;
+
+	IBehaviourTreeNode tree;
+	IBehaviourTreeNode Closetree;
+	IBehaviourTreeNode Fartree;
+
+	bool TargetDetected;
+
 	private void Start()
 	{
+
+		GameManager GM = GameManager.instance;
+		target = GM.Player.transform;
+
 		rb = GetComponent<Rigidbody>();
-		state = State.Search;
 		seek = new Seek(transform,target,rb,MaxSpeed,1,0, new Vector3(-10,-10,0));
 		flee = new Flee(transform, target, rb, MaxSpeed,1);
-		arrival = new Arrival(transform, target, rb, MaxSpeed,0.5f,SlowingDIstance, MaxDistanceFromTarget);
+		arrival = new Arrival(transform, target, rb, MaxSpeed,0.5f,SlowingDistance, MaxDistanceFromTarget);
+		arrival.SetOffset(TargetOffset);
 		pursuite = new Pursuite(transform, target, rb, MaxSpeed,1, MaxDistanceFromTarget);
 		obstacleAvoidance = new ObstacleAvoidance(transform, target, rb, MaxSpeed,1f, MAXAHEAD,MaxAvoidanceForce, colliders);
 		separation = new Separation(transform, target, rb, MaxSpeed,1.0f, AvoidTargetDistance);
 		wanders = new Wanders(transform, target, rb, MaxSpeed,1.0f, RadiusWanders, LittleRadiusWanders);
+
+		BTconstructor = new BehaviourTreeConstructor();
+
+
+		//BTCloseTarget = new BehaviourTreeConstructor();
+
+		//BTFarTarget = new BehaviourTreeConstructor();
+
+		//BTFarTarget.Condition("DistanceTest", IsTargetOutOfRange).Do("Seek", AddSeek).End().Build();
+
+		tree = BTconstructor.Sequence("Root").Do("Separation", AddSeparation).Do("ObstacleAvoidance", AddObstaclAvoidance)
+			.Selector("Test")
+				.Selector("TRackBehaviour")
+					.Sequence("InTargetRange")
+
+						.Condition("IsInAttackRange ?", IsTargetInAttackRange)
+							.Selector("PlayerInMove")
+							
+								.Sequence("Check Player is in move")
+
+									.InvertedCondition("IsPlayerInMove", TargetIsMoving)
+									.Do("Wander", AddWanders)
+								
+									.End()
+								.Sequence("In case of player was not in move")
+								
+									.Do("Arrival",AddArrival)
+								
+								.End()
+							.End()
+						
+						.End()
+
+
+					.Sequence("InDetectionRange")
+
+						.Condition("IsInDetectionRange", IsTargetInDetectionRange)
+						.Do("Seek", AddSeek)
+
+					.End()
+
+			.End()
+		.End()
+	.Build();
+
+		//behaviorTreeStearingLeaf = new BehaviorTreeStearingLeaf(seek.GetSteering);
+		//DistanceCheckPlayer = new ConditionNode(IsTargetInRange,behaviorTreeStearingLeaf);
+		//root = new BehaviourTreeRoot(DistanceCheckPlayer);
+
+		//root.Init(root);
 	}
+
 
 	void FixedUpdate()
     {
-		//Debug.Log(GetDistanceFromTarget());
-		CheckIAstate();
-		CallIABehaviour();
-	//	Debug.Log(state);
-		rb.velocity = Vector3.ClampMagnitude(rb.velocity, MaxSpeed);
+		CheckTargetDetection();
+		CurrentBehaviours.Clear();
+		tree.Tick(Time.deltaTime);
+		ComputeSteering();
 	}
 
-
-	public void CallIABehaviour()
+	public void ComputeSteering()
 	{
 		Vector3 Steering = new Vector3();
 
@@ -84,62 +154,114 @@ public class IAMove : MonoBehaviour
 
 		rb.AddForce(Steering);
 
-
-		//Debug.DrawLine(transform.position, transform.position + (rb.velocity * MaxSpeed));
-
 		transform.LookAt(transform.position + transform.GetComponent<Rigidbody>().velocity * (Time.deltaTime * 10)); 
 	}
 
-	public void CheckIAstate()
-	{
-		if(target == null)
-		{
-			state = State.Search;
-		}
-
-		else if(target != null && GetDistanceFromTarget() > MaxDistanceFromTarget)
-		{
-			state = State.Target;
-		}
-
-		if(target != null && GetDistanceFromTarget() < MaxDistanceFromTarget)
-		{
-			state = State.Destroy;
-		}
-
-		SetStatusBehaviour(state);
-	}
-
-
-	public void SetStatusBehaviour(State state)
-	{
-		CurrentBehaviours.Clear();
-		switch(state)
-		{
-			case (State.Search):
-			//	CurrentBehaviours.Add(pursuite);
-				CurrentBehaviours.Add(separation);
-			
-				break;
-
-			case (State.Target):
-				CurrentBehaviours.Add(obstacleAvoidance);
-				CurrentBehaviours.Add(seek);
-				CurrentBehaviours.Add(separation);
-				break;
-
-			case (State.Destroy):
-				CurrentBehaviours.Add(obstacleAvoidance);
-				CurrentBehaviours.Add(seek);
-				CurrentBehaviours.Add(separation);
-				break;
-		}
-	}
 
 	public float GetDistanceFromTarget()
 	{
 		return Vector2.Distance(target.position,transform.position);
 	}
+
+	public BehaviourTreeStatus SéquenceTest (float test)
+	{
+
+		return BehaviourTreeStatus.Continue;
+	}
+
+	public BehaviourTreeStatus ComputeSteering(float deltatime)
+	{
+		return BehaviourTreeStatus.Succes;
+	}
+
+
+
+	public BehaviourTreeStatus AddWanders(float DeltaTime)
+	{
+		Debug.Log("In Wanders");
+		CurrentBehaviours.Add(wanders);
+		return BehaviourTreeStatus.Succes;
+	}
+
+	public BehaviourTreeStatus AddObstaclAvoidance(float DeltaTime)
+	{
+		Debug.Log("In Obstacle avoidance");
+		CurrentBehaviours.Add(separation);
+		return BehaviourTreeStatus.Succes;
+	}
+
+	public BehaviourTreeStatus AddSeparation(float DeltaTime)
+	{
+		Debug.Log("In Separation");
+		CurrentBehaviours.Add(separation);
+		return BehaviourTreeStatus.Succes;
+	}
+
+	public BehaviourTreeStatus AddSeek(float DeltaTime)
+	{
+		Debug.Log("In seek");
+		CurrentBehaviours.Add(seek);
+		return BehaviourTreeStatus.Succes;
+	}
+
+	public BehaviourTreeStatus AddArrival(float DeltaTime)
+	{
+		Debug.Log("In arrival");
+		CurrentBehaviours.Add(arrival);
+		return BehaviourTreeStatus.Succes;
+	}
+
+	public BehaviourTreeStatus DebugStuff(float time)
+	{
+		Debug.Log("Pattroling");
+		return BehaviourTreeStatus.Continue;
+	}
+
+	public void CheckTargetDetection()
+	{
+		if (IsTargetInDetectionRange(0.0f))
+		{
+			TargetDetected = true;
+		}
+		else
+		{
+			TargetDetected = false;
+		}
+	}
+
+	public bool IsTargetDetected(float DeltaTime)
+	{
+		return TargetDetected;
+	}
+
+	public bool IsTargetInDetectionRange(float Adegager)
+	{
+		if (GetDistanceFromTarget() < DetectionRange)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public bool IsTargetInAttackRange(float ADegager)
+	{
+		if(GetDistanceFromTarget() < AttackModeRange)
+		{
+			return true;
+		}
+		return false;
+	}
+
+
+	public bool TargetIsMoving(float ADegager)
+	{
+		if(target.GetComponentInParent<Rigidbody>().velocity.magnitude > 1.0f)
+		{
+			return true;
+		}
+		return false;
+	}
+
 
 	public void OnDestroy()
 	{
@@ -151,8 +273,11 @@ public class IAMove : MonoBehaviour
 	{
 		if(other.tag == "Ennemy")
 		{
-			other.GetComponent<IAMove>().removeFromSeparation += separation.RemoveTarget;
-			separation.AddTarget(other.transform);
+			if (other.GetComponent<IAMove>() != null)
+			{
+				other.GetComponent<IAMove>().removeFromSeparation += separation.RemoveTarget;
+				separation.AddTarget(other.transform);
+			}
 		}
 		else if(other.tag == "Player")
 		{
