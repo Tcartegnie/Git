@@ -22,6 +22,8 @@ public class Seek : Steering
 		return steering;
 	}
 
+
+
 	public Vector3 ComputeSteering(Vector3 targetPosition)
 	{
 		Vector3 desiredVelocity = (((targetPosition + ComputeOffset()) - EntityTr.position));//Get the direction
@@ -33,6 +35,7 @@ public class Seek : Steering
 		Vector3 steering = desiredVelocity - Rb.velocity;//Get velocity to apply
 		return steering;
 	}
+
 
 	public bool IsPositionReach()
 	{
