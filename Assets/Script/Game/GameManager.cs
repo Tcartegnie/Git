@@ -17,15 +17,11 @@ public class GameManager : MonoBehaviour
 
 	public OnVictory onVictory;
 	public OnGameOver onGamover;
+	public EnnemyWave waveManager;
 
 
-	[SerializeField]
-	List<EnnemyList> ennemyWave;
-
-	int WaveIndex = 0;
 
 
-	public List<GameObject> InstanciedEntitys = new List<GameObject>();
 
 	public void Awake()
 	{
@@ -44,34 +40,11 @@ public class GameManager : MonoBehaviour
 
 	public void Start()
 	{
-		shipFactory.onEnnemyListEmpty += OnEnnemyWaveDone;
-		InstanciateWaves(WaveIndex);
+		waveManager.onEndWaves += EndGameVictory;
+		waveManager.StartWaves();
 	}
 
-	public void InstanciateWaves(int WaveID)
-	{
-		shipFactory.InstantiateWave(ennemyWave[WaveID].GetShips());
-		InstanciedEntitys = shipFactory.GetEnnemiesList();
-		shipFactory.InitEnnemies(Player,asteroidfield);
-	}
-	  
-	public void InstantiateNextWave()
-	{
-		WaveIndex += 1;
-		InstanciateWaves(WaveIndex);
-	}
-
-	public void OnEnnemyWaveDone()
-	{
-		if ((WaveIndex +1) == ennemyWave.Count)
-		{
-			EndGameVictory();
-		}
-		else
-		{
-			InstantiateNextWave();
-		}
-	}
+	
 
 	public void EndGameVictory()
 	{
