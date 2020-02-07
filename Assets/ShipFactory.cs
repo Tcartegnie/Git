@@ -4,35 +4,27 @@ using UnityEngine;
 
 public enum ShipType
 {
-	Scout = 0
+	Scout = 0,
+	Cruiser = 1
 }
 
 public class ShipFactory : MonoBehaviour
 {
+	public GameObject Scout;	
+	public GameObject Cruiser;
+	public GameObject Player;
 
-	public delegate void OnEnnemyListEmpty();
-
-	public OnEnnemyListEmpty onEnnemyListEmpty;
-
-	public GameObject Scout;
-
-	List<GameObject> Ennemies = new List<GameObject>();
 
 	Dictionary<ShipType, GameObject> PrefabShip = new Dictionary<ShipType, GameObject>();
 
-	public List<Transform> Spawns = new List<Transform>();
 
 
 
-
-	public List<GameObject> GetEnnemiesList()
-	{
-		return Ennemies;
-	}
 
 	public void Awake()
 	{
 		PrefabShip.Add(ShipType.Scout, Scout);
+		PrefabShip.Add(ShipType.Cruiser, Cruiser);
 	}
 
 	public GameObject GetShipGameObject(ShipType ShipType)
@@ -40,52 +32,28 @@ public class ShipFactory : MonoBehaviour
 		return PrefabShip[ShipType];
 	}
 
-	public void InstantiateWave(List<ShipType>ListShip)
+	public GameObject InstantiateShip(ShipType shiptype,Vector3 Position)
 	{
-		for (int i = 0; i < ListShip.Count; i++)
-		{
-			InstantiateShip(ListShip[i], Spawns[Random.Range(0, Spawns.Count)].position);
-		}
+		GameObject entity = Instantiate(GetShipGameObject(shiptype),Position, new Quaternion());
+		InitShip(entity);
+		return entity;
+
 	}
 
-	public void InstantiateShip(ShipType shiptype,Vector3 Position)
+	public void InitShip(GameObject Ship)
 	{
-		GameObject go = Instantiate(GetShipGameObject(shiptype),Position, new Quaternion());
-		go.GetComponent<ShipState>().ShipDestroy += OnShipDestroy;
-		Ennemies.Add(go);
-	}
-
-	public void InitEnnemies(GameObject Player,AsteroïdField asteroïdField)
-	{
-		for (int i = 0; i < Ennemies.Count; i++)
+		//Ship.GetComponent<ShipState>().ShipDestroy += OnShipDestroy;//?
+		if (Ship.GetComponent<IAMove>()!= null)
 		{
-			Ennemies[i].GetComponent<IAMove>().target = Player.transform;
-			Ennemies[i].GetComponent<IAMove>().colliders = asteroïdField.Asteroids;
-			Ennemies[i].GetComponent<AiAttack>().target = Player;
+			Ship.GetComponent<IAMove>().target = Player.transform;
+			//Ennemies[i].GetComponent<IAMove>().colliders = asteroïdField.Asteroids;
 		}
+
+		if (Ship.GetComponent<AiAttack>() != null)
+		{
+			Ship.GetComponent<AiAttack>().target = Player;
+		}	
 	}
 	
-	public void OnShipDestroy(GameObject ship)
-	{
-		Ennemies.Remove(ship);
-		CheckListEmpty();
-	}
-	
-	private bool IsListEmpty()
-	{
-		if(Ennemies.Count == 0)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	public void CheckListEmpty()
-	{
-		if(IsListEmpty())
-		{
-			onEnnemyListEmpty();
-		}
-	}
 
 }
