@@ -1,18 +1,25 @@
-﻿using System.Collections;
+﻿
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BehaviorTree : MonoBehaviour
+public enum BehaviourTreeStatus
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	Succes,
+	Continue,
+	Failed,
+}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+public abstract class BehaviorTreeNode
+{
+	protected BehaviorTreeNode ChildNodes;
+	protected string Name;
+	public abstract BehaviourTreeStatus Tick(float Time);
+
+	public BehaviorTreeNode(string name)
+	{
+		Name = name;
+	}
+
 }
