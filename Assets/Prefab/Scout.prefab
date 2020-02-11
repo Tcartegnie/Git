@@ -172,15 +172,15 @@ MonoBehaviour:
   MaxDistanceFromTarget: 0
   DetectionRange: 150
   AttackModeRange: 50
-  MAXAHEAD: 30
+  MAXAHEAD: 50
   MaxAvoidanceForce: 20
   colliders: []
-  SlowingDistance: 50
+  SlowingDistance: 150
   TargetOffset: {x: 0, y: 0, z: -50}
   RadiusWanders: 30
   LittleRadiusWanders: 30
-  SeparationStrenght: 100
-  AvoidTargetDistance: 15
+  SeparationStrenght: 2
+  AvoidTargetDistance: 100
 --- !u!114 &6548358127331636263
 MonoBehaviour:
   m_ObjectHideFlags: 0
