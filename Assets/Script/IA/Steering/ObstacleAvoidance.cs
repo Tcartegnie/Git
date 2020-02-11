@@ -15,38 +15,72 @@ public class ObstacleAvoidance : Steering
 		this.MaxAvoidanceForce = MaxAvoidanceForce;
 	}
 
+
 	Vector3 ComputeSteering()
 	{
-		Vector3 ahead = new Vector3();
-		Vector3 HalfAhead = new Vector3();
-		float DynamicLenght = Rb.velocity.magnitude / MaxHead;
-		ahead = EntityTr.position + Rb.velocity.normalized * DynamicLenght;
-		HalfAhead = EntityTr.position + (Rb.velocity.normalized * (DynamicLenght * 0.5f));
 
-		Debug.DrawLine(EntityTr.position, HalfAhead, Color.red);
-		Debug.DrawLine(ahead, HalfAhead, Color.blue);
+		Debug.DrawLine(EntityTr.position, GetHalfAhead(), Color.red);
+		Debug.DrawLine(GetAhead(), GetHalfAhead(), Color.blue);
 
-		List<Vector3> ObjectTransformPositon = new List<Vector3>();
-
-		for (int i = 0; i < colliders.Count; i++)
-		{
-			if (Vector3.Distance(colliders[i].transform.position, ahead) < colliders[i].transform.localScale.magnitude + EntityTr.localScale.magnitude
-		   || (Vector3.Distance(colliders[i].transform.position, HalfAhead) < colliders[i].transform.localScale.magnitude + EntityTr.localScale.magnitude)
-		   && Vector3.Distance(colliders[i].transform.position, EntityTr.position) < colliders[i].transform.localScale.magnitude + EntityTr.localScale.magnitude)
-			{
-				ObjectTransformPositon.Add(colliders[i].transform.position);
-			}
-		}
-		Vector3 ClosestPosition = GetTheClosestCollider(ObjectTransformPositon);
+		List<Vector3> ObjectsTransformsPositons = GetCollidersInRange();
+		
+		Vector3 ClosestPosition = GetTheClosestCollider(ObjectsTransformsPositons);
 
 		if (ClosestPosition.magnitude != 0)
 		{
-			Vector3 avoidance_force = ahead - ClosestPosition;
-			avoidance_force = avoidance_force.normalized * MaxAvoidanceForce;
-			return avoidance_force;
+			return ComputeAvoidanceForce(ClosestPosition);
 		}
 		return new Vector3();
 	}
+
+	public float GetDynamicLenght()
+	{
+		float DynamicLenght = Rb.velocity.magnitude / MaxHead;
+		return DynamicLenght;
+	}
+
+	public Vector3 GetAhead()
+	{
+		Vector3 ahead = new Vector3();
+		ahead = EntityTr.position + Rb.velocity.normalized * GetDynamicLenght();
+		return ahead;
+	}
+
+	public Vector3 GetHalfAhead()
+	{
+		Vector3 HalfAhead = new Vector3();
+		HalfAhead = EntityTr.position + (Rb.velocity.normalized * (GetDynamicLenght() * 0.5f));
+		return HalfAhead;
+	}
+
+	List<Vector3> GetCollidersInRange()
+	{
+		List<Vector3> ObjectsTransformsPositons = new List<Vector3>();
+		for (int i = 0; i < colliders.Count; i++)
+		{
+			Collider collider = colliders[i].GetComponent<Collider>();
+
+			Vector3 ColliderMaxBound = 	collider.bounds.max;
+			
+
+			if (Vector3.Distance(collider.transform.position, GetAhead()) < ColliderMaxBound.magnitude + EntityTr.localScale.magnitude
+		   || (Vector3.Distance(collider.transform.position, GetHalfAhead()) < ColliderMaxBound.magnitude + EntityTr.localScale.magnitude)
+		   && Vector3.Distance(collider.transform.position, EntityTr.position) < ColliderMaxBound.magnitude + EntityTr.localScale.magnitude)
+			{
+				ObjectsTransformsPositons.Add(colliders[i].transform.position);
+			}
+		}
+		return ObjectsTransformsPositons;
+	}
+
+
+	Vector3 ComputeAvoidanceForce(Vector3 ClosestPosition)
+	{
+		Vector3 avoidance_force = GetAhead() - ClosestPosition;
+		avoidance_force = avoidance_force.normalized * MaxAvoidanceForce;
+		return avoidance_force;
+	}
+
 
 	public Vector3 GetTheClosestCollider(List<Vector3> ColliderPosition)
 	{
