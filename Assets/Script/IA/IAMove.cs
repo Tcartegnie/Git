@@ -92,7 +92,7 @@ public class IAMove : MonoBehaviour
 
 		//BTFarTarget.Condition("DistanceTest", IsTargetOutOfRange).Do("Seek", AddSeek).End().Build();
 
-		tree = BTconstructor.Sequence("Root").Do("Separation", AddSeparation).Do("ObstacleAvoidance", AddObstaclAvoidance)
+		tree = BTconstructor.Sequence("Root").Sequence("BasicSequence")
 			.Selector("Test")
 				.Selector("TRackBehaviour")
 					.Sequence("InTargetRange")
@@ -104,12 +104,12 @@ public class IAMove : MonoBehaviour
 
 									.InvertedCondition("IsPlayerInMove", TargetIsMoving)
 									.Do("Wander", AddWanders)
-								
+									.Do("LookForward", LookForward)
 									.End()
 								.Sequence("In case of player was not in move")
 								
 									.Do("Arrival",AddArrival)
-								
+									.Do("LookForward", LookOnTarget)
 								.End()
 							.End()
 						
@@ -120,11 +120,17 @@ public class IAMove : MonoBehaviour
 
 						.Condition("IsInDetectionRange", IsTargetInDetectionRange)
 						.Do("Seek", AddSeek)
+						.Do("LookForward",LookForward)
 
 					.End()
-
+			
 			.End()
+
 		.End()
+
+				.Do("ObstacleAvoidance", AddObstaclAvoidance)
+		.End()
+		
 	.Build();
 
 		//behaviorTreeStearingLeaf = new BehaviorTreeStearingLeaf(seek.GetSteering);
@@ -149,13 +155,14 @@ public class IAMove : MonoBehaviour
 
 		for(int i  = 0; i < CurrentBehaviours.Count;i++)
 		{
-			Steering += CurrentBehaviours[i].GetSteering() * CurrentBehaviours[i].GetWheight();
+			Steering += CurrentBehaviours[i].GetSteering();
 		}
 
 		rb.AddForce(Steering);
-
-		transform.LookAt(transform.position + transform.GetComponent<Rigidbody>().velocity * (Time.deltaTime * 10)); 
+		
 	}
+
+
 
 
 	public float GetDistanceFromTarget()
@@ -214,7 +221,20 @@ public class IAMove : MonoBehaviour
 	public BehaviourTreeStatus DebugStuff(float time)
 	{
 		Debug.Log("Pattroling");
-		return BehaviourTreeStatus.Continue;
+		return BehaviourTreeStatus.Succes;
+	}
+
+	public BehaviourTreeStatus LookForward(float time)
+	{
+		transform.LookAt(transform.position + transform.GetComponent<Rigidbody>().velocity * (Time.deltaTime * 10)); 
+		return BehaviourTreeStatus.Succes;
+	}
+
+
+	public BehaviourTreeStatus LookOnTarget(float time)
+	{
+		transform.LookAt(target.transform);
+		return BehaviourTreeStatus.Succes;
 	}
 
 	public void CheckTargetDetection()
